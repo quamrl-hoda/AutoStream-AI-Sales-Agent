@@ -119,7 +119,7 @@ Then open `.env` and configure based on your chosen option:
 OPENAI_API_KEY=sk-your-openai-api-key-here
 ```
 
-- Get your key from [OpenAI Console](https://console.openai.com/)
+- Get your key from [OpenAI Console](https://openai.com/api/)
 - The agent uses `gpt-4o-mini` by default (cost-effective and fast)
 
 #### Option B: Hugging Face - Free Alternative
