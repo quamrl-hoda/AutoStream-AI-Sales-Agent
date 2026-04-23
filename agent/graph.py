@@ -29,9 +29,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ──────────────────────────────────────────────
 # STATE SCHEMA
-# ──────────────────────────────────────────────
 
 class AgentState(TypedDict):
     # Full conversation history (auto-merged by LangGraph)
@@ -46,11 +44,8 @@ class AgentState(TypedDict):
     # Last detected intent
     intent: Optional[str]
 
-
-# ──────────────────────────────────────────────
+   
 # LLM SETUP
-# ──────────────────────────────────────────────
-
 def _build_llm() -> ChatOpenAI:
     """Initialise the OpenAI LLM."""
     return ChatOpenAI(
@@ -63,20 +58,24 @@ def _build_llm() -> ChatOpenAI:
 llm = _build_llm()
 
 
-# ──────────────────────────────────────────────
-# SYSTEM PROMPT BUILDER
-# ──────────────────────────────────────────────
 
 SYSTEM_BASE = """You are a helpful sales assistant for AutoStream, a SaaS platform that provides
 automated video editing tools for content creators.
 
-Your goals:
+STRICT RULES:
 1. Greet users warmly for casual messages.
 2. Answer product and pricing questions accurately using ONLY the knowledge base provided.
 3. Detect when a user is ready to sign up (high intent) and begin lead qualification.
 4. Collect the user's name, email, and creator platform ONE AT A TIME — never ask for all
    three at once, and never skip ahead.
 5. Never call any lead-capture tool until you have all three pieces of information.
+6. NEVER fabricate, hallucinate, or make up information not in the knowledge base.
+7. NEVER confirm a sign-up, registration, or purchase unless you are explicitly in the
+   capture/done stage. Do NOT say things like "You're all set to sign up" or
+   "Check your email for instructions" — these are hallucinations.
+8. ONLY respond to the CURRENT step. If you are collecting a name, ONLY ask for the name.
+   If collecting email, ONLY ask for email. Do NOT jump ahead.
+9. Keep responses SHORT (1-3 sentences max). Do NOT over-explain.
 
 At the end of your reply, always include a JSON block like:
 ```json
@@ -101,9 +100,7 @@ def _build_system_prompt(user_message: str, stage: str) -> str:
     return f"{SYSTEM_BASE}\n\n{stage_instruction}\n\n--- KNOWLEDGE BASE ---\n{context}"
 
 
-# ──────────────────────────────────────────────
-# HELPER: EXTRACT INTENT FROM LLM RESPONSE
-# ──────────────────────────────────────────────
+
 
 def _extract_intent(response_text: str) -> Optional[str]:
     """Parse the JSON intent block from the LLM's reply."""
@@ -121,10 +118,6 @@ def _clean_response(response_text: str) -> str:
     """Remove the JSON intent block from the visible reply."""
     return re.sub(r'```json\s*\{.*?\}\s*```', '', response_text, flags=re.DOTALL).strip()
 
-
-# ──────────────────────────────────────────────
-# GRAPH NODES
-# ──────────────────────────────────────────────
 
 def chat_node(state: AgentState) -> AgentState:
     """
@@ -205,6 +198,18 @@ def collect_email_node(state: AgentState) -> AgentState:
     return {**state, "messages": [AIMessage(content=reply)]}
 
 
+def _extract_platform_name(text: str) -> str:
+    """Extract a clean platform name from user input, stripping filler words."""
+    filler_words = {
+        "i", "use", "mainly", "primarily", "my", "the", "platform",
+        "creator", "content", "on", "it's", "its", "is", "a", "an",
+        "called", "named", "channel", "account", "page",
+    }
+    tokens = text.strip().split()
+    cleaned = [t for t in tokens if t.lower() not in filler_words]
+    return " ".join(cleaned).strip() if cleaned else text.strip()
+
+
 def collect_platform_node(state: AgentState) -> AgentState:
     """Accept the creator platform and advance to lead capture."""
     user_msg = state["messages"][-1].content.strip()
@@ -217,8 +222,12 @@ def collect_platform_node(state: AgentState) -> AgentState:
         if p in msg_lower:
             platform = p.capitalize()
             break
-    if not platform and len(user_msg) < 40:
-        platform = user_msg  # Accept free-form answer
+
+    # Accept free-form platform names (e.g. "Striver", "Rumble", etc.)
+    if not platform and len(user_msg) < 60:
+        platform = _extract_platform_name(user_msg)
+        # Capitalize the first letter of each word
+        platform = platform.title() if platform else None
 
     if platform:
         return {
@@ -241,7 +250,7 @@ def capture_node(state: AgentState) -> AgentState:
     )
 
     reply = (
-        f"🎉 You're all set, {state['lead_name']}! We've registered your interest in AutoStream's Pro plan. "
+        f"You're all set, {state['lead_name']}! We've registered your interest in AutoStream's Pro plan. "
         f"Our team will reach out to **{state['lead_email']}** shortly with next steps. "
         f"Welcome aboard, and happy creating on {state['lead_platform']}!"
     )
@@ -253,29 +262,52 @@ def capture_node(state: AgentState) -> AgentState:
     }
 
 
-# ──────────────────────────────────────────────
 # ROUTING LOGIC
-# ──────────────────────────────────────────────
 
-def route(state: AgentState) -> str:
-    """Route to the correct node based on current stage."""
-    return state.get("stage", "chat")
+def router_node(state: AgentState) -> AgentState:
+    """
+    Pass-through entry node. Does NOT modify state — it only
+    exists so we can use conditional edges to dispatch to the
+    correct stage-specific node.
+    """
+    return state
 
 
-# ──────────────────────────────────────────────
+def _route_from_router(state: AgentState) -> str:
+    """Dispatch to the correct processing node based on the current stage."""
+    stage = state.get("stage", "chat")
+    if stage in ("chat", "collect_name", "collect_email", "collect_platform", "capture"):
+        return stage
+    return "chat"
+
+
 # GRAPH ASSEMBLY
-# ──────────────────────────────────────────────
 
 def build_graph() -> StateGraph:
     builder = StateGraph(AgentState)
 
+    # Router is the single entry point — it dispatches to the right node
+    builder.add_node("router", router_node)
     builder.add_node("chat", chat_node)
     builder.add_node("collect_name", collect_name_node)
     builder.add_node("collect_email", collect_email_node)
     builder.add_node("collect_platform", collect_platform_node)
     builder.add_node("capture", capture_node)
 
-    builder.set_entry_point("chat")
+    builder.set_entry_point("router")
+
+    # Router dispatches to the correct node based on current stage
+    builder.add_conditional_edges(
+        "router",
+        _route_from_router,
+        {
+            "chat": "chat",
+            "collect_name": "collect_name",
+            "collect_email": "collect_email",
+            "collect_platform": "collect_platform",
+            "capture": "capture",
+        },
+    )
 
     # After chat node, re-route based on updated stage
     builder.add_conditional_edges(

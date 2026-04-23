@@ -1,9 +1,7 @@
-# AutoStream AI Sales Agent 🎬
+# AutoStream AI Sales Agent
 
-> A Conversational AI Agent built with **LangGraph +  Openai + RAG**  
-> Assignment Project for **ServiceHive / Inflx** — Social-to-Lead Agentic Workflow
+ A Conversational AI Agent built with **LangGraph +  Openai + RAG**  
 
----
 
 ## Table of Contents
 
@@ -16,7 +14,6 @@
 7. [Running Tests](#running-tests)
 8. [Tech Stack](#tech-stack)
 
----
 
 ## Overview
 
@@ -29,7 +26,6 @@ This agent acts as an AI-powered sales assistant for **AutoStream**, a fictional
 - Call a **mock lead-capture API** only after all three fields are collected
 - Maintain **conversation memory** across 5–6 turns using LangGraph state
 
----
 
 ## Project Structure
 
@@ -61,8 +57,11 @@ autostream_agent/
 
 ### Prerequisites
 
-- Python 3.9 or later
-- An **Anthropic API key** (free tier works) — get one at https://console.anthropic.com/
+- Python 3.11
+- An **OpenAI API key** (free tier works) — get one at https://console.openai.com/
+**OR**
+- An **Hugging Face token** (free tier works) — get one at https://huggingface.co/settings/tokens
+
 
 ### Step-by-Step Setup
 
@@ -96,8 +95,8 @@ You should see:
 
 ```
 ╔══════════════════════════════════════════════════════╗
-║        AutoStream AI Sales Agent  🎬                 ║
-║  Powered by OpenAI + LangGraph + RAG           ║
+║        AutoStream AI Sales Agent                     ║
+║  Powered by OpenAI + LangGraph + RAG                 ║
 ╚══════════════════════════════════════════════════════╝
 
 Agent: Hi! Welcome to AutoStream. How can I help you today?
@@ -106,8 +105,6 @@ You: _
 ```
 
 Type naturally and the agent will respond. Type `quit` or `exit` to end.
-
----
 
 ## Architecture Explanation
 
@@ -149,7 +146,6 @@ Intent classification happens in two layers:
 
 The LLM classification takes priority; heuristics fire only when the LLM's JSON block is missing or unparsable.
 
----
 
 ## Conversation Flow
 
@@ -180,10 +176,10 @@ User: "YouTube"
   → mock_lead_capture("Priya Sharma", "priya@example.com", "YouTube") called
   → Stage: done
 
-Agent: "🎉 You're all set, Priya! Our team will reach out to priya@example.com shortly."
+Agent: "You're all set, Priya! Our team will reach out to priya@example.com shortly."
 ```
 
----
+
 
 ## WhatsApp Deployment via Webhooks
 
@@ -262,7 +258,6 @@ In the Meta Developer Console, set your webhook URL to `https://yourdomain.com/w
 | Media | Use WhatsApp's media API to send images/videos if the agent needs them |
 | Rate limits | WhatsApp allows ~1,000 free conversations/month on the basic tier |
 
----
 
 ## Running Tests
 
@@ -286,7 +281,6 @@ tests/test_agent.py::TestLeadCapture::test_invalid_email_raises  PASSED
 8 passed in 0.42s
 ```
 
----
 
 ## Tech Stack
 
@@ -294,13 +288,10 @@ tests/test_agent.py::TestLeadCapture::test_invalid_email_raises  PASSED
 |---|---|
 | Language | Python 3.9+ |
 | Agent Framework | LangGraph 0.1+ |
-| LLM | Claude Haiku (claude-haiku-4-5) via Anthropic API |
-| LLM Abstraction | LangChain + langchain-anthropic |
+| LLM | OpenAI (gpt-4o-mini) via OpenAI API |
+| LLM Abstraction | LangChain + langchain-openai |
 | Knowledge Base | Local JSON file (RAG via keyword retrieval) |
 | Lead Tool | Custom `mock_lead_capture()` function |
 | Testing | pytest |
 | Deployment (optional) | Flask/FastAPI + WhatsApp Cloud API |
 
----
-
-*Built for the ServiceHive / Inflx ML Intern Assignment — AutoStream Social-to-Lead Agentic Workflow*

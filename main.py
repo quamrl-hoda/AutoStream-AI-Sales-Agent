@@ -15,8 +15,8 @@ from agent.graph import build_graph, AgentState
 
 BANNER = """
 ╔══════════════════════════════════════════════════════╗
-║        AutoStream AI Sales Agent  🎬                 ║
-║  Powered by Claude Haiku + LangGraph + RAG           ║
+║        AutoStream AI Sales Agent                     ║
+║  Powered by OpenAI + LangGraph + RAG                 ║
 ║  Type 'quit' or 'exit' to end the session.           ║
 ╚══════════════════════════════════════════════════════╝
 """
@@ -44,37 +44,27 @@ def run_agent() -> None:
     while True:
         # Guard: if we've already finished, stop
         if state.get("stage") == "done":
-            print("Agent: Thanks for chatting! Have a great day. 👋")
+            print("Agent: Thanks for chatting! Have a great day.")
             break
 
         try:
             user_input = input("You: ").strip()
         except (EOFError, KeyboardInterrupt):
-            print("\nAgent: Goodbye! 👋")
+            print("\nAgent: Quitting!")
             break
 
         if not user_input:
             continue
 
         if user_input.lower() in {"quit", "exit", "bye", "goodbye"}:
-            print("Agent: Thanks for chatting! Goodbye! 👋")
+            print("Agent: Thanks for chatting! Goodbye!")
             break
 
         # Add user message to state
         state["messages"] = state["messages"] + [HumanMessage(content=user_input)]
 
-        # Route to correct node based on current stage
-        stage = state.get("stage", "chat")
-        node_map = {
-            "chat": "chat",
-            "collect_name": "collect_name",
-            "collect_email": "collect_email",
-            "collect_platform": "collect_platform",
-            "capture": "capture",
-        }
-        entry = node_map.get(stage, "chat")
-
-        # Invoke the graph from the right entry point
+        # Invoke the graph — the router entry node dispatches
+        # to the correct stage-specific node automatically
         result = graph.invoke(state, config={"configurable": {"thread_id": "1"}})
         state = result
 

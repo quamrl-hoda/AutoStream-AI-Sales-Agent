@@ -45,7 +45,7 @@ def mock_lead_capture(name: str, email: str, platform: str) -> dict:
 
     # Simulate the CRM call
     print(f"\n{'='*50}")
-    print(f"  ✅  LEAD CAPTURED SUCCESSFULLY")
+    print(f"  [OK]  LEAD CAPTURED SUCCESSFULLY")
     print(f"{'='*50}")
     print(f"  Name     : {name}")
     print(f"  Email    : {email}")

@@ -14,9 +14,7 @@ from agent.rag_pipeline import retrieve_context
 from tools.lead_capture import mock_lead_capture
 
 
-# ──────────────────────────────────────────────
 # INTENT CLASSIFIER TESTS
-# ──────────────────────────────────────────────
 
 class TestIntentClassifier:
     def test_greeting(self):
@@ -47,9 +45,7 @@ class TestIntentClassifier:
         assert result == Intent.HIGH_INTENT
 
 
-# ──────────────────────────────────────────────
 # RAG PIPELINE TESTS
-# ──────────────────────────────────────────────
 
 class TestRAGPipeline:
     def test_retrieves_pricing_for_price_query(self):
@@ -71,9 +67,7 @@ class TestRAGPipeline:
         assert "AutoStream" in context
 
 
-# ──────────────────────────────────────────────
 # LEAD CAPTURE TOOL TESTS
-# ──────────────────────────────────────────────
 
 class TestLeadCapture:
     def test_successful_capture(self, capsys):
