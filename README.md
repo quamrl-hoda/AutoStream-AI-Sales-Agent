@@ -64,12 +64,11 @@ You need **one** of the following LLM providers:
 
 | Option | Provider | Model | Cost | API Key Source |
 |--------|----------|-------|------|----------------|
-| **A** (Recommended) | OpenAI | `gpt-4o-mini` | Paid | [console.openai.com](https://console.openai.com/) |
+| **A**  | OpenAI | `gpt-4o-mini` | Paid | [console.openai.com](https://console.openai.com/) |
 | **B** (Free) | Hugging Face | `zai-org/GLM-5.1` | Free | [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) |
 
 > **Tip:** If you don't have an OpenAI API key or want to avoid costs, use **Option B** with Hugging Face's free tier.
 
----
 
 ### Step-by-Step Setup
 
