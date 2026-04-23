@@ -1,0 +1,47 @@
+{
+  "company": "AutoStream",
+  "tagline": "Automated video editing tools for content creators",
+  "plans": {
+    "basic": {
+      "name": "Basic Plan",
+      "price_monthly": 29,
+      "features": [
+        "10 videos per month",
+        "720p resolution",
+        "Standard editing tools",
+        "Email support"
+      ]
+    },
+    "pro": {
+      "name": "Pro Plan",
+      "price_monthly": 79,
+      "features": [
+        "Unlimited videos",
+        "4K resolution",
+        "AI captions",
+        "Advanced editing tools",
+        "24/7 priority support"
+      ]
+    }
+  },
+  "policies": {
+    "refund": "No refunds after 7 days of purchase.",
+    "support": "24/7 support is available only on the Pro plan. Basic plan users have access to email support during business hours.",
+    "trial": "A free trial may be available. Contact sales for details."
+  },
+  "platforms_supported": ["YouTube", "Instagram", "TikTok", "Facebook", "Twitter", "LinkedIn"],
+  "faqs": [
+    {
+      "question": "What is AutoStream?",
+      "answer": "AutoStream is a SaaS platform providing automated video editing tools for content creators on platforms like YouTube, Instagram, TikTok, and more."
+    },
+    {
+      "question": "What is the difference between Basic and Pro?",
+      "answer": "The Basic plan costs $29/month and allows 10 videos/month at 720p. The Pro plan costs $79/month with unlimited videos, 4K resolution, AI captions, and 24/7 support."
+    },
+    {
+      "question": "Can I get a refund?",
+      "answer": "Refunds are available within 7 days of purchase. After 7 days, no refunds are issued."
+    }
+  ]
+}
