@@ -22,12 +22,12 @@
 
 This agent acts as an AI-powered sales assistant for **AutoStream**, a fictional SaaS platform offering automated video editing tools. The agent can:
 
-- ✅ Classify user intent: **Greeting / Product Inquiry / High-Intent Lead**
-- ✅ Answer questions using a **RAG-powered local knowledge base**
-- ✅ Detect buying intent and begin **lead qualification**
-- ✅ Collect Name → Email → Platform **one at a time**
-- ✅ Call a **mock lead-capture API** only after all three fields are collected
-- ✅ Maintain **conversation memory** across 5–6 turns using LangGraph state
+- Classify user intent: **Greeting / Product Inquiry / High-Intent Lead**
+- Answer questions using a **RAG-powered local knowledge base**
+- Detect buying intent and begin **lead qualification**
+- Collect Name → Email → Platform **one at a time**
+- Call a **mock lead-capture API** only after all three fields are collected
+- Maintain **conversation memory** across 5–6 turns using LangGraph state
 
 ---
 
@@ -57,8 +57,6 @@ autostream_agent/
 └── README.md
 ```
 
----
-
 ## How to Run Locally
 
 ### Prerequisites
@@ -70,10 +68,14 @@ autostream_agent/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/autostream-agent.git
-cd autostream-agent
+git clone https://github.com/your-username/AutoStream-AI-Sales-Agent.git
+cd AutoStream-AI-Sales-Agent
 
 # 2. Create and activate a virtual environment (recommended)
+uv install
+uv init
+uv venv 
+or 
 python -m venv venv
 source venv/bin/activate        # Linux / macOS
 # venv\Scripts\activate          # Windows
@@ -84,10 +86,10 @@ pip install -r requirements.txt
 # 4. Set your API key
 cp .env.example .env
 # Open .env and replace "your_api_key_here" with your actual key
-# ANTHROPIC_API_KEY=sk-ant-...
+# OPENAI_API_KEY=...
 
 # 5. Run the agent
-python main.py
+uv run main.py
 ```
 
 You should see:
@@ -95,7 +97,7 @@ You should see:
 ```
 ╔══════════════════════════════════════════════════════╗
 ║        AutoStream AI Sales Agent  🎬                 ║
-║  Powered by Claude Haiku + LangGraph + RAG           ║
+║  Powered by OpenAI + LangGraph + RAG           ║
 ╚══════════════════════════════════════════════════════╝
 
 Agent: Hi! Welcome to AutoStream. How can I help you today?
