@@ -57,38 +57,100 @@ autostream_agent/
 
 ### Prerequisites
 
-- Python 3.11
-- An **OpenAI API key** (free tier works) — get one at https://console.openai.com/
-**OR**
-- An **Hugging Face token** (free tier works) — get one at https://huggingface.co/settings/tokens
+- **Python 3.11+**
+- **Git** installed
 
+You need **one** of the following LLM providers:
+
+| Option | Provider | Model | Cost | API Key Source |
+|--------|----------|-------|------|----------------|
+| **A** (Recommended) | OpenAI | `gpt-4o-mini` | Paid | [console.openai.com](https://console.openai.com/) |
+| **B** (Free) | Hugging Face | `zai-org/GLM-5.1` | Free | [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) |
+
+> **Tip:** If you don't have an OpenAI API key or want to avoid costs, use **Option B** with Hugging Face's free tier.
+
+---
 
 ### Step-by-Step Setup
 
+**1. Clone the repository**
+
 ```bash
-# 1. Clone the repository
 git clone https://github.com/your-username/AutoStream-AI-Sales-Agent.git
 cd AutoStream-AI-Sales-Agent
+```
 
-# 2. Create and activate a virtual environment (recommended)
-uv install
-uv init
-uv venv 
-or 
-python -m venv venv
-source venv/bin/activate        # Linux / macOS
-# venv\Scripts\activate          # Windows
+**2. Create and activate a virtual environment**
 
-# 3. Install dependencies
+```bash
+# Using uv (recommended)
+uv venv
+.venv\Scripts\activate          # Windows
+source .venv/bin/activate       # Linux / macOS
+
+# OR using standard Python
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+source .venv/bin/activate       # Linux / macOS
+```
+
+**3. Install dependencies**
+
+```bash
+# Using uv
+uv pip install -r requirements.txt
+
+# OR using pip
 pip install -r requirements.txt
+```
 
-# 4. Set your API key
+**4. Configure your API key**
+
+Create a `.env` file in the project root:
+
+```bash
 cp .env.example .env
-# Open .env and replace "your_api_key_here" with your actual key
-# OPENAI_API_KEY=...
+```
 
-# 5. Run the agent
+Then open `.env` and configure based on your chosen option:
+
+#### Option A: OpenAI (Recommended)
+
+```env
+OPENAI_API_KEY=sk-your-openai-api-key-here
+```
+
+- Get your key from [OpenAI Console](https://console.openai.com/)
+- The agent uses `gpt-4o-mini` by default (cost-effective and fast)
+
+#### Option B: Hugging Face - Free Alternative
+
+If OpenAI is not available or you prefer a **free** model, use `zai-org/GLM-5.1` via the Hugging Face Inference API:
+
+```env
+HF_TOKEN=hf_your-huggingface-token-here
+OPENAI_API_KEY=hf_your-huggingface-token-here
+OPENAI_API_BASE=https://api-inference.huggingface.co/v1
+OPENAI_MODEL=zai-org/GLM-5.1
+```
+
+**How to set up Hugging Face (free):**
+
+1. Create a free account at [huggingface.co](https://huggingface.co/join)
+2. Go to [Settings > Access Tokens](https://huggingface.co/settings/tokens)
+3. Click **"New token"** and create a token with `read` access
+4. Copy the token (starts with `hf_...`) and paste it in your `.env` file as shown above
+
+> **Note:** The Hugging Face Inference API is free for public models. The `zai-org/GLM-5.1` model works as an OpenAI-compatible drop-in replacement via the `/v1` endpoint.
+
+**5. Run the agent**
+
+```bash
+# Using uv
 uv run main.py
+
+# OR using python directly
+python main.py
 ```
 
 You should see:
